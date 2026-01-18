@@ -9,19 +9,36 @@ from llm_client import LMStudioClient
 class RecipeGenerator:
     """Generates recipes and ingredient substitutions using LLM."""
 
-    RECIPE_SYSTEM_PROMPT = """You are an experienced home chef who creates practical, delicious recipes.
+    RECIPE_SYSTEM_PROMPT = """You are an experienced home chef and nutritionist who creates practical, delicious recipes.
 When given ingredients, you create a complete recipe with:
 
 1. **Recipe Title** - A descriptive name for the dish
-2. **Ingredients** - Full list with quantities (use the provided ingredients plus common pantry staples)
-3. **Instructions** - Clear, numbered steps
-4. **Tips** - 1-2 helpful cooking tips
+2. **Servings** - Number of portions this recipe makes
+3. **Nutrition per Serving** - Estimated calories, protein (g), carbs (g), fat (g)
+4. **Ingredients** - Full list with quantities (use the provided ingredients plus common pantry staples)
+5. **Instructions** - Clear, numbered steps
+6. **Tips** - 1-2 helpful cooking tips
 
-Keep recipes accessible for home cooks. Be specific about cooking times and temperatures."""
+Keep recipes accessible for home cooks. Be specific about cooking times and temperatures.
+Always include nutritional estimates per serving."""
 
     SUBSTITUTION_SYSTEM_PROMPT = """You are a knowledgeable chef who helps with ingredient substitutions.
 Provide practical alternatives that maintain the dish's flavor and texture.
 Be concise - give 2-3 substitution options with brief explanations of how they'll affect the dish."""
+
+    MACRO_SYSTEM_PROMPT = """You are an experienced chef and nutritionist who creates meals to meet specific nutritional targets.
+When given macro targets, you create a complete recipe that hits those targets as closely as possible.
+
+Your response must include:
+
+1. **Recipe Title** - A descriptive name for the dish
+2. **Servings** - Number of portions (usually 1 for macro-targeted meals)
+3. **Nutrition per Serving** - Show calories, protein (g), carbs (g), fat (g) and how close they are to the targets
+4. **Ingredients** - Full list with precise quantities to hit the macros
+5. **Instructions** - Clear, numbered steps
+6. **Tips** - 1-2 helpful tips
+
+Focus on whole, nutritious ingredients. Be precise with quantities to match the macro targets."""
 
     def __init__(self, client: LMStudioClient = None):
         """
@@ -78,6 +95,48 @@ Be concise - give 2-3 substitution options with brief explanations of how they'l
             system_prompt=self.SUBSTITUTION_SYSTEM_PROMPT,
             temperature=0.5,
             max_tokens=300
+        )
+
+    def generate_from_macros(self, calories: int = None, protein: int = None,
+                              carbs: int = None, fat: int = None,
+                              dietary_filters: list[str] = None) -> str:
+        """
+        Generate a recipe based on target macronutrients.
+
+        Args:
+            calories: Target calories per serving
+            protein: Target protein in grams
+            carbs: Target carbohydrates in grams
+            fat: Target fat in grams
+            dietary_filters: Optional dietary restrictions
+
+        Returns:
+            str: Generated recipe text
+        """
+        targets = []
+        if calories:
+            targets.append(f"{calories} calories")
+        if protein:
+            targets.append(f"{protein}g protein")
+        if carbs:
+            targets.append(f"{carbs}g carbs")
+        if fat:
+            targets.append(f"{fat}g fat")
+
+        if not targets:
+            return "Please provide at least one macro target (calories, protein, carbs, or fat)."
+
+        prompt = f"Create a meal that meets these nutritional targets: {', '.join(targets)}"
+
+        if dietary_filters:
+            filters_text = ", ".join(dietary_filters)
+            prompt += f"\n\nDietary requirements: {filters_text}"
+
+        return self.client.generate_response(
+            prompt=prompt,
+            system_prompt=self.MACRO_SYSTEM_PROMPT,
+            temperature=0.7,
+            max_tokens=1000
         )
 
 

@@ -68,11 +68,12 @@ class GroceryRemixCLI:
     def print_menu(self):
         """Print main menu options."""
         print("\n--- Main Menu ---")
-        print("[1] Generate Recipe")
-        print("[2] Ingredient Substitution")
-        print("[3] View Saved Recipes")
-        print("[4] Search Recipes")
-        print("[5] Delete Recipe")
+        print("[1] Generate Recipe (from ingredients)")
+        print("[2] Generate Recipe (from macros)")
+        print("[3] Ingredient Substitution")
+        print("[4] View Saved Recipes")
+        print("[5] Search Recipes")
+        print("[6] Delete Recipe")
         print("[0] Exit")
         print("-" * 20)
 
@@ -182,6 +183,68 @@ class GroceryRemixCLI:
         )
 
         print(f"\nRecipe saved! (ID: {recipe_id})")
+
+    def generate_from_macros(self):
+        """Generate a recipe based on macro targets."""
+        if not self._ensure_generator():
+            return
+
+        print("\n--- Generate from Macros ---")
+        print("Enter your nutritional targets (press Enter to skip any):")
+
+        calories = self.get_input("Calories: ")
+        protein = self.get_input("Protein (g): ")
+        carbs = self.get_input("Carbs (g): ")
+        fat = self.get_input("Fat (g): ")
+
+        # Validate at least one target
+        if not any([calories, protein, carbs, fat]):
+            print("\nPlease enter at least one macro target.")
+            return
+
+        filters = self.get_dietary_filters()
+
+        # Build targets display
+        targets = []
+        if calories:
+            targets.append(f"{calories} cal")
+        if protein:
+            targets.append(f"{protein}g protein")
+        if carbs:
+            targets.append(f"{carbs}g carbs")
+        if fat:
+            targets.append(f"{fat}g fat")
+
+        print(f"\nTargets: {', '.join(targets)}")
+        if filters:
+            print(f"Dietary filters: {', '.join(filters)}")
+
+        print("\nGenerating macro-targeted meal... (this may take a moment)")
+        print("-" * 40)
+
+        try:
+            recipe = self.generator.generate_from_macros(
+                calories=int(calories) if calories else None,
+                protein=int(protein) if protein else None,
+                carbs=int(carbs) if carbs else None,
+                fat=int(fat) if fat else None,
+                dietary_filters=filters
+            )
+            print(recipe)
+            print("-" * 40)
+
+            # Store for potential saving
+            self.last_recipe = recipe
+            self.last_ingredients = targets  # Use targets as "ingredients" for display
+            self.last_filters = filters
+
+            # Ask to save
+            save = self.get_input("\nSave this recipe? (y/n): ")
+            if save.lower() in ["y", "yes"]:
+                self.save_last_recipe()
+
+        except ConnectionError as e:
+            print(f"\n[ERROR] {e}")
 
     def ingredient_substitution(self):
         """Get substitution suggestions for an ingredient."""
@@ -310,12 +373,14 @@ class GroceryRemixCLI:
             if choice == "1":
                 self.generate_recipe()
             elif choice == "2":
-                self.ingredient_substitution()
+                self.generate_from_macros()
             elif choice == "3":
-                self.view_saved_recipes()
+                self.ingredient_substitution()
             elif choice == "4":
-                self.search_recipes()
+                self.view_saved_recipes()
             elif choice == "5":
+                self.search_recipes()
+            elif choice == "6":
                 self.delete_recipe()
             elif choice == "0":
                 print("\nGoodbye! Happy cooking!")

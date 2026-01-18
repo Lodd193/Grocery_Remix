@@ -30,6 +30,14 @@ function App() {
   const [subContext, setSubContext] = useState('')
   const [substitution, setSubstitution] = useState(null)
 
+  // Macro state
+  const [macroCalories, setMacroCalories] = useState('')
+  const [macroProtein, setMacroProtein] = useState('')
+  const [macroCarbs, setMacroCarbs] = useState('')
+  const [macroFat, setMacroFat] = useState('')
+  const [macroDietaryFilters, setMacroDietaryFilters] = useState([])
+  const [macroRecipe, setMacroRecipe] = useState(null)
+
   useEffect(() => {
     if (activeTab === 'saved') {
       fetchSavedRecipes()
@@ -52,6 +60,51 @@ function App() {
         ? prev.filter(f => f !== filter)
         : [...prev, filter]
     )
+  }
+
+  const toggleMacroFilter = (filter) => {
+    setMacroDietaryFilters(prev =>
+      prev.includes(filter)
+        ? prev.filter(f => f !== filter)
+        : [...prev, filter]
+    )
+  }
+
+  const generateFromMacros = async () => {
+    if (!macroCalories && !macroProtein && !macroCarbs && !macroFat) {
+      setError('Please enter at least one macro target')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setMacroRecipe(null)
+
+    try {
+      const res = await fetch(`${API_URL}/generate-from-macros`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          calories: macroCalories ? parseInt(macroCalories) : null,
+          protein: macroProtein ? parseInt(macroProtein) : null,
+          carbs: macroCarbs ? parseInt(macroCarbs) : null,
+          fat: macroFat ? parseInt(macroFat) : null,
+          dietary_filters: macroDietaryFilters
+        })
+      })
+
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.detail || 'Failed to generate recipe')
+      }
+
+      const data = await res.json()
+      setMacroRecipe(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const generateRecipe = async () => {
@@ -179,6 +232,12 @@ function App() {
             Generate
           </button>
           <button
+            className={`tab ${activeTab === 'macros' ? 'active' : ''}`}
+            onClick={() => setActiveTab('macros')}
+          >
+            Macros
+          </button>
+          <button
             className={`tab ${activeTab === 'substitute' ? 'active' : ''}`}
             onClick={() => setActiveTab('substitute')}
           >
@@ -282,6 +341,111 @@ function App() {
                   )}
                   <div className="recipe-content" style={{ marginTop: '1rem' }}>
                     {recipe.recipe}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Macros Tab */}
+          {activeTab === 'macros' && (
+            <>
+              <div className="card">
+                <h2>Generate from Macros</h2>
+                <p style={{ marginBottom: '1rem', color: 'var(--color-text)' }}>
+                  Enter your nutritional targets and get a recipe designed to meet them.
+                </p>
+
+                <div className="macro-inputs" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>Calories</label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 500"
+                      value={macroCalories}
+                      onChange={(e) => setMacroCalories(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Protein (g)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 40"
+                      value={macroProtein}
+                      onChange={(e) => setMacroProtein(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Carbs (g)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 50"
+                      value={macroCarbs}
+                      onChange={(e) => setMacroCarbs(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Fat (g)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g., 20"
+                      value={macroFat}
+                      onChange={(e) => setMacroFat(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Dietary Filters (optional)</label>
+                  <div className="checkbox-group">
+                    {DIETARY_OPTIONS.map(filter => (
+                      <label
+                        key={filter}
+                        className={`checkbox-item ${macroDietaryFilters.includes(filter) ? 'checked' : ''}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={macroDietaryFilters.includes(filter)}
+                          onChange={() => toggleMacroFilter(filter)}
+                        />
+                        {filter}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={generateFromMacros}
+                  disabled={loading}
+                  style={{ marginTop: '1rem' }}
+                >
+                  {loading ? 'Generating...' : 'Generate Meal'}
+                </button>
+              </div>
+
+              {loading && (
+                <div className="loading">
+                  <div className="spinner"></div>
+                  <span>Creating your macro-targeted meal...</span>
+                </div>
+              )}
+
+              {macroRecipe && !loading && (
+                <div className="recipe-output card">
+                  <div className="recipe-output-header">
+                    <h2>Your Macro Meal</h2>
+                  </div>
+                  {macroRecipe.targets && (
+                    <div className="tags" style={{ marginBottom: '1rem' }}>
+                      {macroRecipe.targets.calories && <span className="tag">{macroRecipe.targets.calories} cal</span>}
+                      {macroRecipe.targets.protein && <span className="tag">{macroRecipe.targets.protein}g protein</span>}
+                      {macroRecipe.targets.carbs && <span className="tag">{macroRecipe.targets.carbs}g carbs</span>}
+                      {macroRecipe.targets.fat && <span className="tag">{macroRecipe.targets.fat}g fat</span>}
+                    </div>
+                  )}
+                  <div className="recipe-content">
+                    {macroRecipe.recipe}
                   </div>
                 </div>
               )}

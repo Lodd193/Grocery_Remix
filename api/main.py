@@ -61,6 +61,14 @@ class SaveRecipeRequest(BaseModel):
     dietary_filters: list[str] = []
 
 
+class MacroRequest(BaseModel):
+    calories: int | None = None
+    protein: int | None = None
+    carbs: int | None = None
+    fat: int | None = None
+    dietary_filters: list[str] = []
+
+
 # Endpoints
 @app.get("/")
 def root():
@@ -110,6 +118,37 @@ def suggest_substitution(request: SubstitutionRequest):
             "ingredient": request.ingredient,
             "context": request.context,
             "suggestion": suggestion
+        }
+    except ConnectionError as e:
+        raise HTTPException(status_code=503, detail=f"LMStudio connection failed: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/generate-from-macros")
+def generate_from_macros(request: MacroRequest):
+    """Generate a recipe based on target macronutrients."""
+    if not any([request.calories, request.protein, request.carbs, request.fat]):
+        raise HTTPException(status_code=400, detail="Provide at least one macro target")
+
+    try:
+        gen = get_generator()
+        recipe = gen.generate_from_macros(
+            calories=request.calories,
+            protein=request.protein,
+            carbs=request.carbs,
+            fat=request.fat,
+            dietary_filters=request.dietary_filters
+        )
+        return {
+            "recipe": recipe,
+            "targets": {
+                "calories": request.calories,
+                "protein": request.protein,
+                "carbs": request.carbs,
+                "fat": request.fat
+            },
+            "dietary_filters": request.dietary_filters
         }
     except ConnectionError as e:
         raise HTTPException(status_code=503, detail=f"LMStudio connection failed: {str(e)}")
