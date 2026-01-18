@@ -1,51 +1,252 @@
-/* App Layout */
+/* App Layout - Bold Asymmetric Design */
 .app {
   min-height: 100vh;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-/* Header */
+/* ===== BOLD HEADER ===== */
 .header {
-  text-align: center;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #2D232E 0%, #474448 100%);
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative diagonal slice */
+.header::before {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: var(--color-parchment);
+  transform: skewY(-2deg);
+}
+
+/* Subtle pattern overlay */
+.header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
 }
 
 .header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #F1F0EA;
   margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -1px;
+}
+
+.header h1 span {
+  color: #E0DDCF;
+  font-weight: 400;
 }
 
 .header p {
-  color: var(--color-text);
+  color: rgba(241, 240, 234, 0.7);
   font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
 }
 
-/* Main content */
+/* ===== CONTAINER ===== */
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== NAVIGATION TABS ===== */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem 1rem;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+  margin-top: -1rem;
+}
+
+.tab {
+  padding: 0.875rem 1.75rem;
+  background: #F1F0EA;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-taupe-grey);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #474448, #2D232E);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab span {
+  position: relative;
+  z-index: 1;
+}
+
+.tab:hover {
+  border-color: var(--color-gunmetal);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 35, 46, 0.15);
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #474448, #2D232E);
+  color: #F1F0EA;
+  box-shadow: 0 6px 20px rgba(45, 35, 46, 0.3);
+  transform: translateY(-2px);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #2D232E;
+}
+
+/* ===== MAIN CONTENT ===== */
 .main-content {
+  flex: 1;
+  padding: 1rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Generate section */
+/* ===== GENERATE SECTION - ASYMMETRIC LAYOUT ===== */
 .generate-section {
   display: grid;
+  grid-template-columns: 1.4fr 0.6fr;
   gap: 1.5rem;
+  align-items: start;
 }
 
-@media (min-width: 768px) {
-  .generate-section {
-    grid-template-columns: 1fr 1fr;
-  }
+/* Main input card - larger, more prominent */
+.generate-section > .card:first-child {
+  background: #FFFFFF;
+  border: none;
+  box-shadow:
+    0 4px 6px rgba(45, 35, 46, 0.05),
+    0 10px 40px rgba(45, 35, 46, 0.1);
+  position: relative;
 }
 
-/* Recipe output */
+.generate-section > .card:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #474448, #534B52);
+  border-radius: 4px 0 0 4px;
+}
+
+/* Tips card - accent styling */
+.generate-section > .card:nth-child(2) {
+  background: linear-gradient(135deg, #474448 0%, #534B52 100%);
+  color: #F1F0EA;
+  position: relative;
+  overflow: hidden;
+}
+
+.generate-section > .card:nth-child(2)::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.generate-section > .card:nth-child(2) h2 {
+  color: #F1F0EA;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.generate-section > .card:nth-child(2) h2::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: rgba(241, 240, 234, 0.2);
+  border-radius: 50%;
+}
+
+.generate-section > .card:nth-child(2) ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.generate-section > .card:nth-child(2) li {
+  color: rgba(241, 240, 234, 0.9);
+  padding: 0.75rem 0 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(241, 240, 234, 0.1);
+  font-size: 0.9rem;
+  position: relative;
+  display: block;
+  margin: 0;
+}
+
+.generate-section > .card:nth-child(2) li:last-child {
+  border-bottom: none;
+}
+
+.generate-section > .card:nth-child(2) li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 6px;
+  height: 6px;
+  background: #E0DDCF;
+  border-radius: 50%;
+}
+
+/* ===== RECIPE OUTPUT ===== */
 .recipe-output {
-  margin-top: 1.5rem;
+  animation: slideUp 0.4s ease;
 }
 
 .recipe-output-header {
@@ -53,6 +254,23 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-bone);
+}
+
+.recipe-output-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recipe-output-header h2::before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #474448, #534B52);
+  border-radius: 8px;
 }
 
 .recipe-output-actions {
@@ -60,14 +278,86 @@
   gap: 0.5rem;
 }
 
-/* Save modal */
+/* ===== ANIMATIONS ===== */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .generate-section {
+    grid-template-columns: 1fr;
+  }
+
+  .generate-section > .card:nth-child(2) {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 2rem 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 2.25rem;
+  }
+
+  .tabs {
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tab {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tab.active::after {
+    display: none;
+  }
+
+  .main-content {
+    padding: 1rem 1.5rem;
+  }
+
+  .recipe-output-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .recipe-output-actions {
+    width: 100%;
+  }
+
+  .recipe-output-actions .btn {
+    flex: 1;
+  }
+}
+
+/* ===== SAVE/SUBSTITUTION FORMS ===== */
 .save-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Substitution section */
 .substitution-form {
   display: flex;
   flex-direction: column;
@@ -75,5 +365,12 @@
 }
 
 .substitution-result {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--color-bone);
+  animation: fadeIn 0.3s ease;
+}
+
+.substitution-result h3 {
+  margin-bottom: 0.75rem;
 }

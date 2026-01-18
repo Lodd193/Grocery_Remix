@@ -298,9 +298,9 @@ function App() {
                   </button>
                 </div>
 
-                <div className="card">
+                <div className="card tips-card">
                   <h2>Tips</h2>
-                  <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.8' }}>
+                  <ul>
                     <li>Include 3-6 main ingredients</li>
                     <li>Be specific (e.g., "chicken breast" not just "chicken")</li>
                     <li>Add pantry staples like garlic, olive oil</li>
@@ -352,11 +352,11 @@ function App() {
             <>
               <div className="card">
                 <h2>Generate from Macros</h2>
-                <p style={{ marginBottom: '1rem', color: 'var(--color-text)' }}>
+                <p className="section-description">
                   Enter your nutritional targets and get a recipe designed to meet them.
                 </p>
 
-                <div className="macro-inputs" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                <div className="macro-inputs">
                   <div className="form-group">
                     <label>Calories</label>
                     <input
@@ -418,7 +418,6 @@ function App() {
                   className="btn btn-primary"
                   onClick={generateFromMacros}
                   disabled={loading}
-                  style={{ marginTop: '1rem' }}
                 >
                   {loading ? 'Generating...' : 'Generate Meal'}
                 </button>
