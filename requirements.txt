@@ -1,0 +1,9 @@
+# LMStudio API client (OpenAI-compatible)
+openai>=1.0.0
+
+# CLI utilities
+click>=8.0.0
+rich>=13.0.0
+
+# Data handling
+python-dotenv>=1.0.0
