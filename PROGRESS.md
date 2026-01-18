@@ -77,8 +77,47 @@ Grocery_Remix/
 - ✅ Tested all recipe generator features - all working
 
 ### Next Steps
-1. Build CLI interface (src/cli.py) - user-friendly command-line menu
-2. Implement recipe saving (storage.py) - save/load favourites to JSON
+- MVP v1.0 complete!
+
+---
+
+## Session 2 - 18 January 2026
+
+### Completed
+- ✅ Built storage.py with:
+  - RecipeStorage class for JSON persistence
+  - `save_recipe()` - saves recipe with metadata (title, ingredients, filters, timestamp)
+  - `get_all_recipes()` - retrieves all saved recipes
+  - `get_recipe(id)` - retrieves specific recipe by ID
+  - `delete_recipe(id)` - removes recipe from storage
+  - `search_recipes(query)` - searches by title or ingredient
+  - Auto-creates data/saved_recipes.json on first use
+- ✅ Built cli.py with:
+  - GroceryRemixCLI class - full interactive menu system
+  - Main menu: Generate, Substitute, View, Search, Delete, Exit
+  - Ingredient input (comma-separated)
+  - Dietary filter selection (7 options: vegetarian, vegan, gluten-free, etc.)
+  - Save prompt after recipe generation
+  - Full recipe viewing from saved list
+  - Search functionality
+  - Delete with confirmation
+  - Lazy LMStudio connection (only connects when needed)
+- ✅ Tested storage module - all tests passing
+- ✅ Tested CLI module - imports and initializes correctly
+
+### MVP v1.0 - COMPLETE
+All planned features implemented:
+1. ✅ Ingredient Input
+2. ✅ Recipe Generation
+3. ✅ Dietary Filters
+4. ✅ Ingredient Substitutions
+5. ✅ Save Favourites
+
+### How to Run
+```bash
+cd Grocery_Remix
+./venv/Scripts/python.exe src/cli.py
+```
 
 ---
 
